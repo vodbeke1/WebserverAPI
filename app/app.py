@@ -41,7 +41,7 @@ import json
 import pickle
 
 # Set environment variable
-os.environ['STORE_IN_MEM']='False'
+os.environ['STORE_IN_MEM']='True'
 
 class Configuration(metaclass=MetaFlaskEnv):
     ENV = 'development'
@@ -59,9 +59,7 @@ with open('list.pkl', 'wb') as f:
     pickle.dump([], f)
 
 
-#@app.errorhandler()
-#def type_error(e):
-#    return 'explantion', 400
+
 
 
 
