@@ -58,10 +58,9 @@ put_counter = 0
 with open('list.pkl', 'wb') as f:
     pickle.dump([], f)
 
-
-
-
-
+@app.errorhandler(Exception)
+def error_handler(e):
+    return "Internal error: "+str(e), 500
 
 @app.route("/", methods=['GET', 'PUT'])
 def fun():
@@ -72,44 +71,36 @@ def fun():
 
     check_get = request.method == 'GET'
     check_put = request.method == 'PUT'
-    try:
-        # Case if the request is a GET request
-        while check_get:
-            while store_in_mem:
-                return jsonify({'list': app_list})
-            with open('list.pkl', 'rb') as f:
-                app_list = pickle.load(f)
-                return jsonify({'list': app_list})
-
-        # Case if the request is a PUT request
-        put_counter += 1
-        while check_put:
-            while store_in_mem:
-                app_list.append(json.loads(request.data)['item'])
-                app_list = list(set(app_list))
-
-                while put_counter % 10 == 0:
-                    with open('list.pkl', 'wb') as f:
-                        pickle.dump(app_list, f)
-                    return "ECHO: PUT\n"
-                return "ECHO: PUT\n"
-                
-            with open('list.pkl', 'rb') as f:
-                app_list = pickle.load(f)
+    
+    # Case if the request is a GET request
+    while check_get:
+        while store_in_mem:
+            return jsonify({'list': app_list})
+        with open('list.pkl', 'rb') as f:
+            app_list = pickle.load(f)
+            return jsonify({'list': app_list})
+    # Case if the request is a PUT request
+    put_counter += 1
+    while check_put:
+        while store_in_mem:
             app_list.append(json.loads(request.data)['item'])
             app_list = list(set(app_list))
-
-            with open('list.pkl', 'wb') as f:
-                pickle.dump(app_list, f)
-
-            return 'ECHO: PUT\n'
-
-        # Case neither GET or PUT request
+            while put_counter % 10 == 0:
+                with open('list.pkl', 'wb') as f:
+                    pickle.dump(app_list, f)
+                return "ECHO: PUT\n"
+            return "ECHO: PUT\n"
+            
+        with open('list.pkl', 'rb') as f:
+            app_list = pickle.load(f)
+        app_list.append(json.loads(request.data)['item'])
+        app_list = list(set(app_list))
+        with open('list.pkl', 'wb') as f:
+            pickle.dump(app_list, f)
         return 'ECHO: PUT\n'
-    except Exception as e:
-        return str(e)
-
-    
+    # Case neither GET or PUT request
+    return 'ECHO: PUT\n'
+        
 if __name__ == '__main__':
     app.run(port='8080')
 
