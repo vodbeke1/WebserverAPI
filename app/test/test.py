@@ -15,5 +15,12 @@ if __name__ == "__main__":
         print(r.status_code)
         print(r.text)
 
+        if i == 19:
+            check = json.loads(r.text)
+            if len(check['list']) == 20:
+                print("Test success")
+            else:
+                print("Test failed")
+
 
 

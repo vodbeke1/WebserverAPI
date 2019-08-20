@@ -42,6 +42,7 @@ import pickle
 
 # Set environment variable
 os.environ['STORE_IN_MEM']='True'
+list_path = "app/list.pkl"
 
 class Configuration(metaclass=MetaFlaskEnv):
     ENV = 'development'
@@ -55,7 +56,7 @@ app_list = []
 put_counter = 0
 
 # Initialize empty pickled list
-with open('list.pkl', 'wb') as f:
+with open(list_path, 'wb') as f:
     pickle.dump([], f)
 
 @app.errorhandler(Exception)
@@ -76,7 +77,7 @@ def fun():
     while check_get:
         while store_in_mem:
             return jsonify({'list': app_list})
-        with open('list.pkl', 'rb') as f:
+        with open(list_path, 'rb') as f:
             app_list = pickle.load(f)
             return jsonify({'list': app_list})
     # Case if the request is a PUT request
@@ -86,16 +87,16 @@ def fun():
             app_list.append(json.loads(request.data)['item'])
             app_list = list(set(app_list))
             while put_counter % 10 == 0:
-                with open('list.pkl', 'wb') as f:
+                with open(list_path, 'wb') as f:
                     pickle.dump(app_list, f)
                 return "ECHO: PUT\n"
             return "ECHO: PUT\n"
             
-        with open('list.pkl', 'rb') as f:
+        with open(list_path, 'rb') as f:
             app_list = pickle.load(f)
         app_list.append(json.loads(request.data)['item'])
         app_list = list(set(app_list))
-        with open('list.pkl', 'wb') as f:
+        with open(list_path, 'wb') as f:
             pickle.dump(app_list, f)
         return 'ECHO: PUT\n'
     # Case neither GET or PUT request
